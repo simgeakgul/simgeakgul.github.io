@@ -82,7 +82,8 @@
   const material = new THREE.MeshStandardMaterial({
     map: colorTex,
     displacementMap: depthTex,
-    displacementScale: 30,
+    displacementScale: 150,
+    displacementBias: -50,
     metalness: 0.0,
     roughness: 1.0
   });
