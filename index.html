@@ -70,8 +70,8 @@
 
   // ——— Load your pano + depth & build inside-out sphere ———
   const loader   = new THREE.TextureLoader();
-  const colorTex = loader.load('pano_refined.jpg');
-  const depthTex = loader.load('depth.jpg');
+  const colorTex = loader.load('fixed_pano.jpg');
+  const depthTex = loader.load('depth_pano.jpg');
   depthTex.minFilter = THREE.LinearFilter;
   depthTex.magFilter = THREE.LinearFilter;
   depthTex.wrapS = depthTex.wrapT = THREE.ClampToEdgeWrapping;
