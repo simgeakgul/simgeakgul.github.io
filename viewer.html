@@ -32,7 +32,7 @@
 
   const params = new URLSearchParams(window.location.search);
   const folder = params.get('folder') || 'default_folder';
-  
+
   const canvas   = document.getElementById('c');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -74,8 +74,9 @@
 
   // ——— Load your pano + depth & build inside-out sphere ———
   const loader   = new THREE.TextureLoader();
-  const colorTex = loader.load('fixed_pano.jpg');
-  const depthTex = loader.load('depth_pano.jpg');
+  const base = `test_folders/${folder}`;
+  const colorTex = loader.load(`${base}/fixed_pano.jpg`);
+  const depthTex = loader.load(`${base}/depth_pano.jpg`);
   depthTex.minFilter = THREE.LinearFilter;
   depthTex.magFilter = THREE.LinearFilter;
   depthTex.wrapS = depthTex.wrapT = THREE.ClampToEdgeWrapping;
