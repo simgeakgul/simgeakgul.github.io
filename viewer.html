@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>360° Depth-Pano Viewer</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    #c   { display: block; width: 100vw; height: 100vh; }
+    /* instructions */
+    #blocker {
+      position: absolute; top:0; left:0;
+      width:100%; height:100%;
+      background: rgba(0,0,0,0.5);
+      display:flex; align-items:center;
+      justify-content:center;
+      color:white; font:20px sans-serif;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div id="blocker">Click to enter and lock pointer</div>
+  <canvas id="c"></canvas>
+
+  <!-- Three.js core -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- PointerLockControls for FPS-style mouse look + WASD -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/PointerLockControls.js"></script>
+
+  <script>
+  // ——— Boilerplate: renderer + scene + camera ———
+
+  const params = new URLSearchParams(window.location.search);
+  const folder = params.get('folder') || 'default_folder';
+  
+  const canvas   = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias:true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene  = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+  camera.position.set(0, 0, 0.1);  // just inside the sphere
+
+  // ——— PointerLockControls setup ———
+  const controls = new THREE.PointerLockControls(camera, document.body);
+  scene.add(controls.getObject());
+
+  const blocker = document.getElementById('blocker');
+  blocker.addEventListener('click', () => {
+    controls.lock();
+  });
+
+  controls.addEventListener('lock',   () => blocker.style.display = 'none');
+  controls.addEventListener('unlock', () => blocker.style.display = 'flex');
+
+  // ——— WASD + Arrow key state ———
+  const keyState = { forward:false, back:false, left:false, right:false };
+  document.addEventListener('keydown', e => {
+    switch (e.code) {
+      case 'KeyW': case 'ArrowUp':    keyState.forward = true; break;
+      case 'KeyS': case 'ArrowDown':  keyState.back    = true; break;
+      case 'KeyA': case 'ArrowLeft':  keyState.left    = true; break;
+      case 'KeyD': case 'ArrowRight': keyState.right   = true; break;
+    }
+  });
+  document.addEventListener('keyup', e => {
+    switch (e.code) {
+      case 'KeyW': case 'ArrowUp':    keyState.forward = false; break;
+      case 'KeyS': case 'ArrowDown':  keyState.back    = false; break;
+      case 'KeyA': case 'ArrowLeft':  keyState.left    = false; break;
+      case 'KeyD': case 'ArrowRight': keyState.right   = false; break;
+    }
+  });
+
+  // ——— Load your pano + depth & build inside-out sphere ———
+  const loader   = new THREE.TextureLoader();
+  const colorTex = loader.load('fixed_pano.jpg');
+  const depthTex = loader.load('depth_pano.jpg');
+  depthTex.minFilter = THREE.LinearFilter;
+  depthTex.magFilter = THREE.LinearFilter;
+  depthTex.wrapS = depthTex.wrapT = THREE.ClampToEdgeWrapping;
+
+  const geometry = new THREE.SphereBufferGeometry(500, 200, 100);
+  geometry.scale(-1, 1, 1);
+
+  const material = new THREE.MeshStandardMaterial({
+    map: colorTex,
+    displacementMap: depthTex,
+    displacementScale: 200,
+    displacementBias: -50,
+    metalness: 0.0,
+    roughness: 1.0
+  });
+
+  scene.add(new THREE.Mesh(geometry, material));
+
+  // ——— Lights ———
+  const keyLight = new THREE.DirectionalLight(0xffffff, 1.0);
+  keyLight.position.set(0,1,0);
+  scene.add(keyLight);
+  scene.add(new THREE.AmbientLight(0x888888));
+
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+  hemi.position.set(0, 1, 0);
+  scene.add(hemi);
+
+  // ——— Handle resize ———
+  window.addEventListener('resize', () => {
+    const W = window.innerWidth, H = window.innerHeight;
+    renderer.setSize(W, H);
+    camera.aspect = W / H;
+    camera.updateProjectionMatrix();
+  });
+
+  // ——— Animation + movement ———
+  const speed = 50; // units per second
+  let prevTime = performance.now();
+
+  function animate(now) {
+    requestAnimationFrame(animate);
+
+    const delta = (now - prevTime) / 1000;
+    prevTime = now;
+
+    if (controls.isLocked) {
+      if (keyState.forward) controls.moveForward( speed * delta );
+      if (keyState.back)    controls.moveForward(-speed * delta );
+      if (keyState.left)    controls.moveRight(-speed * delta );
+      if (keyState.right)   controls.moveRight( speed * delta );
+    }
+
+    renderer.render(scene, camera);
+  }
+  animate(performance.now());
+  </script>
+</body>
+</html>

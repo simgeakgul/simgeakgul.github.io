@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>360° Viewer Gallery</title>
+  <style>
+    body { margin: 0; font-family: sans-serif; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; padding: 10px; }
+    .gallery a { text-decoration: none; color: inherit; }
+    .gallery img { width: 100%; height: auto; display: block; cursor: pointer; border: 2px solid #ccc; border-radius: 4px; }
+    .gallery img:hover { border-color: #888; }
+  </style>
+</head>
+<body>
+  <div class="gallery" id="gallery"></div>
+
+  <script>
+    // List of folder names inside test_folders
+    const folders = [
+      // Add your painting folder names here:
+      "achillies",
+      "arnolfini",
+      "landscape",
+      "mill"
+      // ...
+    ];
+
+    const gallery = document.getElementById('gallery');
+    folders.forEach(name => {
+      const link = document.createElement('a');
+      link.href = `viewer.html?folder=${encodeURIComponent(name)}`;
+
+      const img = document.createElement('img');
+      img.src = `test_folders/${name}/input.jpg`;
+      img.alt = name;
+
+      link.appendChild(img);
+      gallery.appendChild(link);
+    });
+  </script>
+</body>
+</html>
