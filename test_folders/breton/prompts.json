@@ -1,6 +1,5 @@
 {
-  "atmosphere": "Continue the scene in the original style.",
-  "sky_or_ceiling": "Continue the sky in the original style.",
-  "ground_or_floor": "Continue the ground in the original style."
+  "atmosphere": "rustic outdoor setting, pastoral, impressionistic style",
+  "sky_or_ceiling": "cloudy",
+  "ground_or_floor": "dirt, grass, rocks"
 }
-
