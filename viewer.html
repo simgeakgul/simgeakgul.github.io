@@ -83,6 +83,7 @@
 
   const geometry = new THREE.SphereBufferGeometry(500, 200, 100);
   geometry.scale(-1, 1, 1);
+  geometry.rotateY( THREE.MathUtils.degToRad( -90 ) );
 
   const material = new THREE.MeshStandardMaterial({
     map: colorTex,
@@ -101,7 +102,7 @@
   scene.add(keyLight);
   scene.add(new THREE.AmbientLight(0x888888));
 
-  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.6);
+  const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 0.4);
   hemi.position.set(0, 1, 0);
   scene.add(hemi);
 
